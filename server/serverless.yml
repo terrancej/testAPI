@@ -1,49 +1,49 @@
-service: 
-  name: CustomLambdaAuth
+service: TreeTrunkAPI
 
-frameworkVersion: '2'
-
-plugins:
-  - serverless-pseudo-parameters
+frameworkVersion: '3'
 
 custom:
-  userTable: user
+  poolName: terrance
+  userTable: users
   tableThroughputs:
     dev: "10"
-  customProviderName: my.ether.login
+  customProviderName: tt.ether.login
 
 provider:
-  region: ap-southeast-2
   name: aws
+  stage: dev
+  region: us-east-2
+  profile: rewrite
   runtime: nodejs12.x
-  lambdaHashingVersion: '20201221'
   environment:
     DEVELOPER_PROVIDER_NAME: ${self:custom.customProviderName}
     USERTABLE_NAME: ${self:custom.userTable}
     IDENTITY_POOL_ID: { Ref: CognitoIdentityPool }
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - "dynamodb:GetItem"
-        - "dynamodb:PutItem"
-        - "dynamodb:UpdateItem"
-        - "dynamodb:ExecuteStatement"
-        - "dynamodb:PartiQLSelect"
-      Resource:
-        - "Fn::GetAtt": [UserTable, Arn]
-        - "Fn::Join":
-            - "/"
-            - - { "Fn::GetAtt": [UserTable, Arn] }
-              - "index/*"
-    - Effect: "Allow"
-      Action:
-        - "cognito-identity:GetCredentialsForIdentity"
-        - "cognito-identity:GetOpenIdTokenForDeveloperIdentity"
-      Resource:
-        - "Fn::Join":
-            - "/"
-            - - "arn:aws:cognito-identity:#{AWS::Region}:#{AWS::AccountId}:identitypool"
-              - Ref: CognitoIdentityPool
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "dynamodb:GetItem"
+            - "dynamodb:PutItem"
+            - "dynamodb:UpdateItem"
+            - "dynamodb:ExecuteStatement"
+            - "dynamodb:PartiQLSelect"
+          Resource:
+            - "Fn::GetAtt": [UserTable, Arn]
+            - "Fn::Join":
+                - "/"
+                - - { "Fn::GetAtt": [UserTable, Arn] }
+                  - "index/*"
+        - Effect: "Allow"
+          Action:
+            - "cognito-identity:GetCredentialsForIdentity"
+            - "cognito-identity:GetOpenIdTokenForDeveloperIdentity"
+          Resource:
+            - "Fn::Join":
+                - "/"
+                - - "arn:aws:cognito-identity:${aws:region}:${aws:accountId}:identitypool"
+                  - Ref: CognitoIdentityPool
 functions:
   Login: ${file(resources/functions.yml):Login}
   GetNonce: ${file(resources/functions.yml):GetNonce}

@@ -65,8 +65,7 @@ export const Login = () => {
         let {
           data: { nonce },
         } = await axios(
-          `${process.env.REACT_APP_API_BASE_URL}${
-            process.env.REACT_APP_API_GET_NONCE_PATH
+          `${process.env.REACT_APP_API_BASE_URL}${process.env.REACT_APP_API_GET_NONCE_PATH
           }?address=${address.toLowerCase()}`,
           {
             method: 'GET',
@@ -122,7 +121,7 @@ export const Login = () => {
             accessKeyId: data.AccessKeyId,
             secretAccessKey: data.SecretKey,
             sessionToken: data.SessionToken,
-            region: 'ap-southeast-2',
+            region: 'us-west-2',
             service: 'execute-api',
           });
           setAwsClient(aws);
